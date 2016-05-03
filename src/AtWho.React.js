@@ -19,7 +19,7 @@ const KEY_CODE = {
     WHITE_SPACE: 32
 };
 
-const OPTION_LIMIT = 5;
+const OPTION_LIMIT = 8;
 
 
 export default class AtWhoReact extends Component {
@@ -52,7 +52,7 @@ export default class AtWhoReact extends Component {
     }
 
     _onKeyUp(event) {
-        let {data} = this.props;
+        let {data, maxedListCount} = this.props;
 
         // TODO : change it to props
         if (event.keyCode === 50 && event.shiftKey) {
@@ -96,7 +96,7 @@ export default class AtWhoReact extends Component {
             let {searchKey} = this.state;
             let {data} = this.props;
             let matchedList = data.filter(item=>item.value.indexOf(searchKey) != -1);
-            let matchedLength = Math.min(matchedList.length, OPTION_LIMIT);
+            let matchedLength = Math.min(matchedList.length, maxedListCount);
 
 
             let activeIndexOffset = event.keyCode == KEY_CODE.DOWN ? 1 : -1;
@@ -199,7 +199,7 @@ export default class AtWhoReact extends Component {
         let optionListDOM = null;
         let searchKey = this.state.searchKey;
         let activeIndex = this.state.activeIndex || 0;
-        const {activeStyle} = this.props;
+        const {activeStyle, maxedListCount} = this.props;
 
         if (this.state.showOption) {
             let optionListData = this.props.data;
@@ -209,7 +209,7 @@ export default class AtWhoReact extends Component {
                 .filter(
                     (item, index)=>item.value.indexOf(searchKey) != -1
                 ).filter(
-                    (item, index)=>index < OPTION_LIMIT
+                    (item, index)=>index < maxedListCount
                 ).map((item, index)=> {
                     let active = activeIndex == index;
                     return (
@@ -223,7 +223,7 @@ export default class AtWhoReact extends Component {
         return (
             <div style={{position: 'relative'}}>
 
-                <div id="atMirror" ref='atMirror' style={{
+                <div ref='atMirror' style={{
                     position: 'absolute',
                     left: -9999,
                     top: 0,
@@ -236,7 +236,7 @@ export default class AtWhoReact extends Component {
                 </div>
 
 
-                <div id="atView" ref='atView' style={{
+                <div ref='atView' style={{
                     left: this.state.optionPositionX,
                     top: this.state.optionPositionY,
                     display: this.state.showOption ? 'block' : 'none',
@@ -260,12 +260,14 @@ AtWhoReact.propTypes = {
     flag: PropTypes.string,
     data: PropTypes.array.isRequired,
     activeStyle: PropTypes.object,
-    componentItem: PropTypes.any
+    componentItem: PropTypes.any,
+    maxedListCount: PropTypes.number
 };
 
 AtWhoReact.defaultProps = {
     flag: '',
     data: [],
     activeStyle: { backgroundColor: 'green' },
-    componentItem: AtWhoReactTmpl
+    componentItem: AtWhoReactTmpl,
+    maxedListCount: OPTION_LIMIT
 };
