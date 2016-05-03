@@ -1,31 +1,48 @@
 # react-atwho
-基于[at.js](https://github.com/ichord/At.js)改写的react组件, 用于类似weibo中输入@之后出现的下拉选项.
+A React component which provide '@' features based on [at.js](https://github.com/ichord/At.js)
+*** note *** This component now is only tested in **chrome**
 
-## 提示符
-目前只支持@符号，可以通过向上/向下箭头选择激活状态的候选项，通过回车将选中的候选项写入到输入框中
 
-## 数据格式
-当前数据定义为一个数组，每个元素需要有name属性，如下: 
+## Flag
+Now only @ is supported to trigger the list, and you can use ***arrow up*** and ***arrow down*** to 
+select different option and ***enter*** to choose option
+
+## Source data
+An array of data should provide for the tmpl. ***value*** should provided for each item. ***desc*** 
+which will displayed in the tmpl, is also supported. ***value*** will be inserted when item is chosen.  
+Here is an example of the data: 
 ```javascript
-let testData = [{name: 'Top-Level API'},
-    {name: 'Component API'},
-    {name: 'Component Specs and Lifecycle'},
-    {name: 'Supported Tags and Attributes'},
-    {name: 'Event System'},
-    {name: 'DOM Differences'},
-    {name: 'Special Non-DOM Attributes'},
-    {name: 'Reconciliation'},
-    {name: 'React (Virtual) DOM Terminology'}
+let testData = [{value: 'Top-Level API', desc: 'top level api'},
+    {value: 'Component API'},
+    {value: 'Component Specs and Lifecycle'},
+    {value: 'Supported Tags and Attributes'},
+    {value: 'Event System'},
+    {value: 'DOM Differences'},
+    {value: 'Special Non-DOM Attributes'},
+    {value: 'Reconciliation'},
+    {value: 'React (Virtual) DOM Terminology'}
   ];
 ```
 
-## 模板
-使用了固定的模板，在模板中添加了active状态下的特有inline style: 
+
+## Tmpl
+A given tmpl is used by default in AtWho.React.js, you can also use your own tmpl: 
 ```html
-<li style={active ? {backgroundColor: 'green'} : {}}>{name}</li>
+<div style={computedStyle} className={computedClassName}>{desc}</div>
 ```
 
+## props
+Available props: 
+* data: source data for tmp, available type is PropTypes.array.isRequired
+    
+* activeStyle: active style for selected item, available type is PropTypes.object
+    
+* componentItem: tmpl component, available type is PropTypes.any
+    
+* maxedListCount: max count of options to display, available type is PropTypes.number
+    
+
 ## TODO List: 
-1. 提示符可配置
-2. 数据格式可配置
-3. 模板可配置
+1. Make flag configurable. 
+2. add eslint 
+3. added class/activeClass to props

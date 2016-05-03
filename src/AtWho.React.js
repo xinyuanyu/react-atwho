@@ -6,9 +6,7 @@ import React, {PropTypes, Component} from 'react';
 import AtWhoReactTmpl from './AtWho.React.Tmpl';
 
 // TODO : 配置信息
-const ATWHOREACT_CONFIG = {
-    flag: '@'
-};
+const ATWHO_FLAG = '@';
 
 const KEY_CODE = {
     DOWN: 40,
@@ -265,7 +263,7 @@ AtWhoReact.propTypes = {
 };
 
 AtWhoReact.defaultProps = {
-    flag: '',
+    flag: ATWHO_FLAG,
     data: [],
     activeStyle: { backgroundColor: 'green' },
     componentItem: AtWhoReactTmpl,
