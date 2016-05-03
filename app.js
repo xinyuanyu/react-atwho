@@ -3,21 +3,22 @@
  */
 
 'use strict';
-let React = require('react');
-let AtWhoReact = require('./src/AtWho.React');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import AtWhoReact from './src/AtWho.React';
 
 
-let testData = [{name: 'Top-Level API'},
-    {name: 'Component API'},
-    {name: 'Component Specs and Lifecycle'},
-    {name: 'Supported Tags and Attributes'},
-    {name: 'Event System'},
-    {name: 'DOM Differences'},
-    {name: 'Special Non-DOM Attributes'},
-    {name: 'Reconciliation'},
-    {name: 'React (Virtual) DOM Terminology'}];
+let testData = [{ value: 'Top-Level API' },
+    { value: 'Component API' },
+    { value: 'Component Specs and Lifecycle' },
+    { value: 'Supported Tags and Attributes' },
+    { value: 'Event System' },
+    { value: 'DOM Differences' },
+    { value: 'Special Non-DOM Attributes' },
+    { value: 'Reconciliation' },
+    { value: 'React (Virtual) DOM Terminology' }];
 
-React.render(
-    <AtWhoReact data={testData}/>,
+ReactDOM.render(
+    <AtWhoReact data={testData} />,
     document.getElementById('input-container')
 );

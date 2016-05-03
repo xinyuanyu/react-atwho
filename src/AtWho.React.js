@@ -2,23 +2,15 @@
  * Created by xiyu on 8/25/2015.
  */
 'use strict';
+import React, {PropTypes, Component} from 'react';
+import AtWhoReactTmpl from './AtWho.React.Tmpl';
 
-let React = require('react');
-
-// component
-let AtWhoReactTmpl = require('./AtWho.React.Tmpl');
-
-// utils
-let $ = require('jquery');
-let _ = require('underscore');
-
-
-// 配置信息
-let ATWHOREACT_CONFIG = {
+// TODO : 配置信息
+const ATWHOREACT_CONFIG = {
     flag: '@'
 };
 
-let KEY_CODE = {
+const KEY_CODE = {
     DOWN: 40,
     UP: 38,
     ESC: 27,
@@ -27,143 +19,117 @@ let KEY_CODE = {
     WHITE_SPACE: 32
 };
 
-let OPTION_LIMIT = 5;
+const OPTION_LIMIT = 5;
 
-function getInitState() {
-    return {
-        text: '',
-        showOption: false,
-        optionPositionX: 0,
-        optionPositionY: 0,
-        optionPositionBottom: 0,
-        searchKey: '',
-        activeIndex: 0
+
+export default class AtWhoReact extends Component {
+    constructor(props) {
+        super(props);
+        // init state
+        this.state = {
+            text: '',
+            showOption: false,
+            optionPositionX: 0,
+            optionPositionY: 0,
+            searchKey: '',
+            activeIndex: 0
+        };
     }
-}
-
-let AtWhoReact = React.createClass({
-
-    getInitialState() {
-        return getInitState();
-    },
-
-    propTypes: {
-        flag: React.PropTypes.string,
-        data: React.PropTypes.array.isRequired
-    },
 
     _onChange(event) {
         let value = event.target.value;
         this.setState({
             text: event.target.value
         })
-    },
+    }
+
     _onKeyDown(event) {
         if (this.state.showOption &&
             (event.keyCode == KEY_CODE.DOWN || event.keyCode == KEY_CODE.UP
             || event.keyCode == KEY_CODE.ENTER)) {
             event.preventDefault();
         }
-    },
+    }
 
     _onKeyUp(event) {
-        // TODO: 重新判断
-        // 暂时强制使用@作为提示符
+        let {data} = this.props;
+
+        // TODO : change it to props
         if (event.keyCode === 50 && event.shiftKey) {
-            // 显示候选项
-            console.log('显示候选项');
+            // show list
 
-            // 计算top 和 left 对应的值
-
-            let atTargetMirror = this.refs.atTarget.getDOMNode();
-            let atTargetInput = this.refs.atInput.getDOMNode();
-            let atTarget = this.refs.atTarget.getDOMNode();
+            // calculate the position
+            let atTargetInput = this.refs.atInput;
+            let atTarget = this.refs.atTarget;
 
 
-            if (!atTargetMirror || !atTargetInput || !atTarget) {
+            if (!atTargetInput || !atTarget) {
                 return;
             }
 
-            let $atTargetMirror = $(atTargetMirror);
-            let $atTargetInput = $(atTargetInput);
-            let $atTarget = $(atTarget);
-
-            let atTargetPosition = $atTargetMirror.position();
-
-            let rect = {
-                left: atTargetPosition.left,
-                top: atTargetPosition.top,
-                bottom: atTargetPosition.top + $atTarget.height()
-            };
-
-            let offset = $atTargetInput.offset();
-
-            let x = offset.left + rect.left - $atTargetInput.scrollLeft();
-            let y = offset.top - $atTargetInput.scrollTop();
-            let bottom = y + rect.bottom;
-            y += rect.top;
-
+            let y = atTarget.offsetTop;
+            let x = atTarget.offsetLeft;
+            let h = atTarget.offsetHeight;
+            if (h) {
+                y += h;
+            }
             this.setState({
                 showOption: true,
                 optionPositionX: x,
-                optionPositionY: y,
-                optionPositionBottom: bottom
+                optionPositionY: y
             });
-        } else if (event.keyCode === KEY_CODE.WHITE_SPACE) {
-            // 隐藏
 
+        } else if (event.keyCode === KEY_CODE.WHITE_SPACE) {
+            // hide the list
             this.setState({
                 showOption: false,
                 optionPositionX: 0,
                 optionPositionY: 0,
-                optionPositionBottom: 0,
                 searchKey: '',
                 activeIndex: 0
             });
 
         } else if (event.keyCode == KEY_CODE.DOWN || event.keyCode == KEY_CODE.UP) {
-            // 上下移动active
-
+            // set active index
             event.preventDefault();
 
+            let {searchKey} = this.state;
+            let {data} = this.props;
+            let matchedList = data.filter(item=>item.value.indexOf(searchKey) != -1);
+            let matchedLength = Math.min(matchedList.length, OPTION_LIMIT);
+
+
             let activeIndexOffset = event.keyCode == KEY_CODE.DOWN ? 1 : -1;
-
-
+            let currentIndex = (this.state.activeIndex || 0) + activeIndexOffset;
+            while (currentIndex < 0) {
+                currentIndex += matchedLength;
+            }
             this.setState({
-                activeIndex: (this.state.activeIndex || 0) + activeIndexOffset
-            })
+                activeIndex: currentIndex % matchedLength
+            });
+
         } else if (event.keyCode == KEY_CODE.ENTER) {
-            // 将选中的option添加到文档中
+            // choose option
             if (this.state.showOption) {
-                // TODO : 暂时计算出active的option
-                let optionFiltered = _.filter(this.props.data, (item)=> {
-                    return item.name.indexOf(this.state.searchKey) != -1;
-                });
 
+                let { activeIndex, searchKey } = this.state;
+                activeIndex = activeIndex || 0;
 
-                let activeIndex = this.state.activeIndex;
-                let optionListLength = Math.max(optionFiltered.length, OPTION_LIMIT);
-                while (activeIndex < 0) {
-                    activeIndex += optionListLength;
-                }
-
-                let activeItem = optionFiltered[activeIndex % optionListLength];
+                let optionFiltered = data
+                    .filter(item => item.value.indexOf(searchKey) != -1);
+                let activeItem = optionFiltered[activeIndex];
 
                 this.setState({
                     showOption: false,
                     optionPositionX: 0,
                     optionPositionY: 0,
-                    optionPositionBottom: 0,
                     searchKey: '',
                     activeIndex: 0,
-                    text: this.state.text + activeItem.name + ' '
+                    text: this.state.text + activeItem.value + ' '
                 });
-
-
             }
         } else {
-            // 做optionList的过滤
-
+            // filter the list
             let checkContent = /.*(@.*?)$/.exec(event.target.value);
             if (!checkContent) {
                 // 隐藏
@@ -171,7 +137,6 @@ let AtWhoReact = React.createClass({
                     showOption: false,
                     optionPositionX: 0,
                     optionPositionY: 0,
-                    optionPositionBottom: 0,
                     searchKey: '',
                     activeIndex: 0
                 });
@@ -180,90 +145,85 @@ let AtWhoReact = React.createClass({
                 checkContentValue = checkContentValue.split(' ').reverse()[0];
                 if (checkContentValue.indexOf('@') != -1) {
                     this.setState({
-                        searchKey: checkContentValue.replace('@', '')
+                        searchKey: checkContentValue.replace('@', ''),
+                        activeIndex: 0
                     });
                 } else {
                     this.setState({
                         showOption: false,
                         optionPositionX: 0,
                         optionPositionY: 0,
-                        optionPositionBottom: 0,
                         searchKey: '',
                         activeIndex: 0
                     });
                 }
             }
-
-
         }
-    },
-
+    }
 
     componentDidMount() {
         // 计算部分css的值
-        let atTargetInput = this.refs.atInput.getDOMNode();
-        let atTargetMirror = this.refs.atMirror.getDOMNode();
+        let atTargetInput = this.refs.atInput;
+        let atTargetMirror = this.refs.atMirror;
         if (!atTargetInput || !atTargetMirror) {
             return;
         }
 
-        let $atTargetInput = $(atTargetInput);
-        let $atTargetMirror = $(atTargetMirror);
-
-        $atTargetMirror.width($atTargetInput.width());
-        $atTargetMirror.height($atTargetInput.height());
+        let boundingTargetInput = atTargetInput.getBoundingClientRect();
+        let width = boundingTargetInput.width;
+        let height = boundingTargetInput.height;
+        atTargetMirror.style.width = width + 'px';
+        atTargetMirror.style.height = height + 'px';
 
         let cssAttr = ["overflowY", "height", "width", "paddingTop", "paddingLeft", "paddingRight",
             "paddingBottom", "marginTop", "marginLeft", "marginRight", "marginBottom", 'fontFamily',
             'borderStyle', 'borderWidth', 'wordWrap', 'fontSize', 'lineHeight', 'overflowX'];
 
-        let targetCss = {};
+        let targetComputedCSS = window.getComputedStyle(atTargetInput) ||
+            atTargetInput.currentStyle;
 
-        $.each(cssAttr, (i, p)=> {
-            targetCss[p] = $atTargetInput.css(p);
+        cssAttr.forEach(v=> {
+            let existingValue = targetComputedCSS[v];
+            if (typeof existingValue !== 'undefined') {
+                atTargetMirror.style[v] = existingValue;
+            }
         });
 
-        // 重置Mirror的css信息
-        $atTargetMirror.css(targetCss);
-
-    },
-
+    }
 
     componentDidUpdate() {
-    },
+        // TODO: might need to reset the style for targetMirror
+    }
 
     render() {
-
-
         let optionListDOM = null;
         let searchKey = this.state.searchKey;
         let activeIndex = this.state.activeIndex || 0;
-
+        const {activeStyle} = this.props;
 
         if (this.state.showOption) {
             let optionListData = this.props.data;
-            let optionListFiltered = _.filter(optionListData, (item)=> {
-                return item.name.indexOf(searchKey) != -1;
-            });
 
-            let optionListLength = Math.max(optionListFiltered.length, OPTION_LIMIT);
-            while (activeIndex < 0) {
-                activeIndex += optionListLength;
-            }
 
-            optionListDOM = _.map(optionListFiltered, (item, index)=> {
-
-                let active = (activeIndex % optionListLength) == index;
-
-                return (
-                    <AtWhoReactTmpl key={index} name={item.name} active={active}></AtWhoReactTmpl>
-                )
-            })
+            optionListDOM = optionListData
+                .filter(
+                    (item, index)=>item.value.indexOf(searchKey) != -1
+                ).filter(
+                    (item, index)=>index < OPTION_LIMIT
+                ).map((item, index)=> {
+                    let active = activeIndex == index;
+                    return (
+                        <this.props.componentItem
+                            key={index} name={item.value}
+                            active={active} activeStyle={activeStyle} />
+                    )
+                });
         }
 
         return (
-            <div>
-                <div ref='atMirror' style={{
+            <div style={{position: 'relative'}}>
+
+                <div id="atMirror" ref='atMirror' style={{
                     position: 'absolute',
                     left: -9999,
                     top: 0,
@@ -272,25 +232,40 @@ let AtWhoReact = React.createClass({
                     wordWrap: 'break-word'
                 }}>
                     <span>{this.state.text}</span>
-                    <span ref='atTarget'></span>
+                    <span id="atTarget" ref='atTarget' />
                 </div>
 
 
-                <div ref='atView' style={{
+                <div id="atView" ref='atView' style={{
                     left: this.state.optionPositionX,
-                    top: this.state.optionPositionBottom,
+                    top: this.state.optionPositionY,
                     display: this.state.showOption ? 'block' : 'none',
                     position: 'absolute',
                     backgroundColor: 'red'
                 }}>{optionListDOM}</div>
 
-                <textarea ref='atInput'
-                    onChange={this._onChange} onKeyDown={this._onKeyDown}
-                    onKeyUp={this._onKeyUp} value={this.state.text}
-                    style={{height: 500, width: 900}}></textarea>
+                <textarea
+                    ref='atInput'
+                    onChange={this._onChange.bind(this)}
+                    onKeyDown={this._onKeyDown.bind(this)}
+                    onKeyUp={this._onKeyUp.bind(this)} value={this.state.text}
+                    style={{height: 500, width: 900, fontSize:20}} />
             </div>
         )
     }
-});
 
-module.exports = AtWhoReact;
+}
+
+AtWhoReact.propTypes = {
+    flag: PropTypes.string,
+    data: PropTypes.array.isRequired,
+    activeStyle: PropTypes.object,
+    componentItem: PropTypes.any
+};
+
+AtWhoReact.defaultProps = {
+    flag: '',
+    data: [],
+    activeStyle: { backgroundColor: 'green' },
+    componentItem: AtWhoReactTmpl
+};

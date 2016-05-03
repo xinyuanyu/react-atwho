@@ -4,24 +4,21 @@
   "description": "atwho for react ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "watchify -t [ babelify reactify ] ./app.js -o ./bundle.js -dv"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "browserify": "10.2.4",
     "envify": "3.4.0",
-    "react": "0.13.3",
     "reactify": "1.1.1",
     "watchify": "3.2.2",
     "babelify": "6.1.2",
     "factor-bundle": "2.5.0"
   },
   "dependencies": {
-    "jquery": "2.1.4",
-    "underscore": "*"
-  },
-  "scripts": {
-    "watch": "watchify -t [  babelify reactify ] ./app.js -o ./bundle.js -dv"
+    "react": "^0.14.5",
+    "react-dom": "^0.14.5"
   }
 }
