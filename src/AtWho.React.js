@@ -19,6 +19,12 @@ const KEY_CODE = {
 
 const OPTION_LIMIT = 8;
 
+function checkContains(value, key, ignoreCase) {
+    // TODO : need try-cache
+    return ignoreCase ? value.toLowerCase().indexOf(key.toLowerCase()) !== -1
+        : value.indexOf(key) !== -1;
+}
+
 
 export default class AtWhoReact extends Component {
     constructor(props) {
@@ -50,7 +56,8 @@ export default class AtWhoReact extends Component {
     }
 
     _onKeyUp(event) {
-        let {data, maxedListCount} = this.props;
+        let {data, maxedListCount, ignoreCase} = this.props;
+        let { searchKey, activeIndex } = this.state;
 
         // TODO : change it to props
         if (event.keyCode === 50 && event.shiftKey) {
@@ -91,9 +98,7 @@ export default class AtWhoReact extends Component {
             // set active index
             event.preventDefault();
 
-            let {searchKey} = this.state;
-            let {data} = this.props;
-            let matchedList = data.filter(item=>item.value.indexOf(searchKey) != -1);
+            let matchedList = data.filter(item=>checkContains(item.value, searchKey, ignoreCase));
             let matchedLength = Math.min(matchedList.length, maxedListCount);
 
 
@@ -109,12 +114,10 @@ export default class AtWhoReact extends Component {
         } else if (event.keyCode == KEY_CODE.ENTER) {
             // choose option
             if (this.state.showOption) {
-
-                let { activeIndex, searchKey } = this.state;
                 activeIndex = activeIndex || 0;
 
                 let optionFiltered = data
-                    .filter(item => item.value.indexOf(searchKey) != -1);
+                    .filter(item => checkContains(item.value, searchKey, ignoreCase));
                 let activeItem = optionFiltered[activeIndex];
 
                 this.setState({
@@ -197,14 +200,15 @@ export default class AtWhoReact extends Component {
         let optionListDOM = null;
         let searchKey = this.state.searchKey;
         let activeIndex = this.state.activeIndex || 0;
-        const {style, activeStyle, className, activeClassName, maxedListCount} = this.props;
+        const {style, activeStyle, className, activeClassName,
+            maxedListCount, ignoreCase} = this.props;
 
         if (this.state.showOption) {
             let optionListData = this.props.data;
 
             optionListDOM = optionListData
                 .filter(
-                    (item, index)=>item.value.indexOf(searchKey) != -1
+                    (item, index)=>checkContains(item.value, searchKey, ignoreCase)
                 ).filter(
                     (item, index)=>index < maxedListCount
                 ).map((item, index)=> {
@@ -262,7 +266,8 @@ AtWhoReact.propTypes = {
     activeStyle: PropTypes.object,
     activeClassName: PropTypes.string,
     componentItem: PropTypes.any,
-    maxedListCount: PropTypes.number
+    maxedListCount: PropTypes.number,
+    ignoreCase: PropTypes.bool
 };
 
 AtWhoReact.defaultProps = {
@@ -273,5 +278,6 @@ AtWhoReact.defaultProps = {
     className: 'item',
     activeClassName: 'active',
     componentItem: AtWhoReactTmpl,
-    maxedListCount: OPTION_LIMIT
+    maxedListCount: OPTION_LIMIT,
+    ignoreCase: false
 };

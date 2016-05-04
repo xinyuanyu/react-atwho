@@ -46,8 +46,11 @@ Available props:
 * componentItem: tmpl component, available type is PropTypes.any
     
 * maxedListCount: max count of options to display, available type is PropTypes.number
+
+* ignoreCase: ignoreCase when matching the options
     
 
 ## TODO List: 
 1. Make flag configurable. 
 2. add eslint 
+3. add chinese support 
