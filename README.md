@@ -1,6 +1,6 @@
 # react-atwho
 A React component which provide '@' features based on [at.js](https://github.com/ichord/At.js)
-*** note *** This component now is only tested in **chrome**
+***note*** This component now is only tested in **chrome**
 
 
 ## Flag
@@ -34,8 +34,14 @@ A given tmpl is used by default in AtWho.React.js, you can also use your own tmp
 ## props
 Available props: 
 * data: source data for tmp, available type is PropTypes.array.isRequired
+
+* style: default style for each option item, available type is PropTypes.object
     
 * activeStyle: active style for selected item, available type is PropTypes.object
+
+* className: default className for each option item, available type is PropTypes.string
+
+* activeClassName: extra className for actived option item, available type is PropTypes.string
     
 * componentItem: tmpl component, available type is PropTypes.any
     
@@ -45,4 +51,3 @@ Available props:
 ## TODO List: 
 1. Make flag configurable. 
 2. add eslint 
-3. added class/activeClass to props

@@ -197,11 +197,10 @@ export default class AtWhoReact extends Component {
         let optionListDOM = null;
         let searchKey = this.state.searchKey;
         let activeIndex = this.state.activeIndex || 0;
-        const {activeStyle, maxedListCount} = this.props;
+        const {style, activeStyle, className, activeClassName, maxedListCount} = this.props;
 
         if (this.state.showOption) {
             let optionListData = this.props.data;
-
 
             optionListDOM = optionListData
                 .filter(
@@ -212,8 +211,9 @@ export default class AtWhoReact extends Component {
                     let active = activeIndex == index;
                     return (
                         <this.props.componentItem
-                            key={index} name={item.value}
-                            active={active} activeStyle={activeStyle} />
+                            key={index} value={item.value} active={active}
+                            style={style} activeStyle={activeStyle}
+                            className={className} activeClassName={activeClassName} />
                     )
                 });
         }
@@ -257,7 +257,10 @@ export default class AtWhoReact extends Component {
 AtWhoReact.propTypes = {
     flag: PropTypes.string,
     data: PropTypes.array.isRequired,
+    style: PropTypes.object,
+    className: PropTypes.string,
     activeStyle: PropTypes.object,
+    activeClassName: PropTypes.string,
     componentItem: PropTypes.any,
     maxedListCount: PropTypes.number
 };
@@ -265,7 +268,10 @@ AtWhoReact.propTypes = {
 AtWhoReact.defaultProps = {
     flag: ATWHO_FLAG,
     data: [],
+    style: { backgroundColor: 'grey' },
     activeStyle: { backgroundColor: 'green' },
+    className: 'item',
+    activeClassName: 'active',
     componentItem: AtWhoReactTmpl,
     maxedListCount: OPTION_LIMIT
 };
